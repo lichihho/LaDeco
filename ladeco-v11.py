@@ -1,47 +1,44 @@
+# v1.1 2021/03/10 change l-3 level to woody and herb
 
-#v1.1 2021/03/10 change l-3 level to woody and herb
-
+import argparse
 import os
+import sys
 from os import walk
 from os.path import join
+
 # following statement is to fasten processing speed, also prevent crash
-os.environ['MXNET_CUDNN_AUTOTUNE_DEFAULT'] = '0'
+os.environ["MXNET_CUDNN_AUTOTUNE_DEFAULT"] = "0"
 
-import mxnet as mx
-from mxnet import image
-from mxnet.gluon.data.vision import transforms
-from gluoncv.utils.viz import get_color_pallete
-from gluoncv.data.transforms.presets.segmentation import test_transform
-import gluoncv
 import time
-from matplotlib import pyplot as plt
 
-import numpy as np
-import glob
-import matplotlib.image as mpimg
 import cv2
+import gluoncv
+import mxnet as mx
+import numpy as np
+from gluoncv.data.transforms.presets.segmentation import test_transform
 
 
 def read_image(image):
-    raw_data = np.fromfile(image, dtype=np.uint8) 
-    img = cv2.imdecode(raw_data, 1)  
+    raw_data = np.fromfile(image, dtype=np.uint8)
+    img = cv2.imdecode(raw_data, 1)
     return img
 
 
+# ------------------------------------------------------------------------
+# Parse Arguments
+# ------------------------------------------------------------------------
+parser = argparse.ArgumentParser(
+    formatter_class=argparse.RawTextHelpFormatter,
+    description=(
+        "Calculate the proportion of landscape elements in each image within the folder, "
+        "with each image being computed independently."
+    ),
+)
+parser.add_argument("source", metavar="IMG_FOLDER", help="path to image folder.")
 
-# ctx = mx.cpu(0) # using cpu
-ctx = mx.gpu(0) # using gpu
-
-# Parameters
-img_path = ".\\test_running\\" # path to image folder
-model_name = 'deeplab_resnest269_ade' # pre-trainded model
-
-# Pretrained model list
-"""
-you can choose any model from below list
-
-dataset:ade20k
-model_zoo_name:
+model_helpstring = """\
+The semantic segmantation model.
+Choose one from below:
 fcn_resnet50_ade
 fcn_resnet101_ade
 psp_resnet50_ade
@@ -51,48 +48,124 @@ deeplab_resnet101_ade
 deeplab_resnest50_ade
 deeplab_resnest101_ade
 deeplab_resnest200_ade
-deeplab_resnest269_ade
+deeplab_resnest269_ade (default)
 """
+parser.add_argument(
+    "-m",
+    "--model",
+    help=model_helpstring,
+    default="deeplab_resnest269_ade",
+    choices=[
+        "fcn_resnet50_ade",
+        "fcn_resnet101_ade",
+        "psp_resnet50_ade",
+        "psp_resnet101_ade",
+        "deeplab_resnet50_ade",
+        "deeplab_resnet101_ade",
+        "deeplab_resnest50_ade",
+        "deeplab_resnest101_ade",
+        "deeplab_resnest200_ade",
+        "deeplab_resnest269_ade",
+    ],
+    metavar="MODEL",
+)
+parser.add_argument(
+    "-t",
+    "--threshold",
+    help="The thresold to round an element to zero. (default 0.01)",
+    type=float,
+    default=0.01,
+)
 
+device_helpstring = """\
+Use CPU or GPU.
+Choice are:
+- literal "auto": program will attempt to utilize GPU. If failed, use CPU. (default)
+- literal "cpu": use CPU.
+- literal "gpu": use the first GPU device.
+- a digit like 0, 1, or 2: Use the GPU device specified by the index.
+"""
+parser.add_argument("-d", "--device", help=device_helpstring, default="auto")
+
+args = parser.parse_args()
+
+
+img_path = args.source  # path to image folder
+
+if not os.path.exists(img_path):
+    print(f"{sys.argv[0]}:FATAL:{img_path} not exists.", sys.stderr)
+    sys.exit(1)
+if not os.path.isdir(img_path):
+    print(f"{sys.argv[0]}:FATAL:{img_path} is not a folder.", sys.stderr)
+    sys.exit(1)
+
+model_name = "deeplab_resnest269_ade"  # pre-trainded model
+threshold = args.threshold
+
+# ctx: mxnet context (use CPUs or which GPU)
+if args.device.strip('"') == "auto":
+    ctx = mx.gpu() if mx.context.num_gpus() else mx.cpu()
+elif args.device.strip('"') == "cpu":
+    ctx = mx.cpu()
+elif args.device.strip('"') == "gpu":
+    ctx = mx.gpu()
+elif args.device.strip('"').isdigit():
+    ctx = mx.gpu(int(args.device.strip('"')))
+else:
+    print(f"{sys.argv[0]}:FATAL:Unrecognized device name {args.device}.", sys.stderr)
+    sys.exit(1)
+
+
+del model_helpstring, device_helpstring, args
+
+
+# ------------------------------------------------------------------------
+#
+# ------------------------------------------------------------------------
 # following code read files in subdir
-fileList=[];
+fileList = []
 for root, dirs, files in walk(img_path):
-  for f in files:
-    fullpath = join(root, f)
-    fileList.append(fullpath)
-    #print(fullpath)
+    for f in files:
+        fullpath = join(root, f)
+        fileList.append(fullpath)
+        # print(fullpath)
 
 # select only jpg and png files in fileList
-imgFileList = [name for name in fileList if name.lower().endswith(('.jpg','.png'))]
+imgFileList = [name for name in fileList if name.lower().endswith((".jpg", ".png"))]
 all_file_list_len = len(imgFileList)
-#imgFileList = sorted(glob.glob(img_path + '*.[Jj][Pp][Gg]') + glob.glob(img_path + '*.[Pp][Nn][Gg]'))
+# imgFileList = sorted(glob.glob(img_path + '*.[Jj][Pp][Gg]') + glob.glob(img_path + '*.[Pp][Nn][Gg]'))
 
 
-csv_name = model_name + '_sceneElements.csv'
-all_file_list = os.listdir(img_path)
+csv_name = model_name + "_sceneElements.csv"
 count_start = time.time()
 
 camFolderName = time.strftime("%Y_%m%d_%H%M%S_LADECO", time.localtime())
-#imgfoldername = os.getcwd() +'\\' + camFolderName + '\\'+ camFolderName +'_img' #segmentaion image folder
+# imgfoldername = os.getcwd() +'\\' + camFolderName + '\\'+ camFolderName +'_img' #segmentaion image folder
 
 if not os.path.isdir(camFolderName):
     os.mkdir(camFolderName)
-    #os.mkdir(imgfoldername)
-file_name_attribute ='ladeco_v11.txt' #label file
+    # os.mkdir(imgfoldername)
+file_name_attribute = "ladeco_v11.txt"  # label file
 
-#generate csv head
-with open(file_name_attribute, encoding = 'utf-8') as h:
+# generate csv head
+with open(file_name_attribute, encoding="utf-8") as h:
     lines = h.readlines()
-    labels_attributetitle = ','.join([item.rstrip() for item in lines])
+    labels_attributetitle = ",".join([item.rstrip() for item in lines])
 
 
-g = open(camFolderName + "\\" + camFolderName + '.csv', 'a+')
-g.write('fid,' + labels_attributetitle + '\n')
+g = open(camFolderName + "\\" + camFolderName + ".csv", "a+")
+g.write("fid," + labels_attributetitle + "\n")
 
-model = gluoncv.model_zoo.get_model(model_name, pretrained=True,ctx = mx.gpu(0)) # get model
+model = gluoncv.model_zoo.get_model(
+    model_name, pretrained=True, ctx=mx.gpu(0)
+)  # get model
 
-error_txt_path = os.getcwd() +'\\' + camFolderName + '\\error.txt' # save error txt
+error_txt_path = os.getcwd() + "\\" + camFolderName + "\\error.txt"  # save error txt
 
+# ------------------------------------------------------------------------
+#
+# ------------------------------------------------------------------------
+# fmt: off
 count = 0
 for i_name in imgFileList:
     try:
@@ -128,7 +201,7 @@ for i_name in imgFileList:
             jarray[j]=o
             
         # clean value that smaller than threshold eg. < 0.01
-        jarray=np.where(jarray < 0.01, 0, jarray);
+        jarray=np.where(jarray < threshold, 0, jarray);
         
         
         # compute various Levels of landscape elements
