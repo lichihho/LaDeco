@@ -7,9 +7,6 @@ import time
 from os import walk
 from os.path import join as joinpath
 
-# following statement is to fasten processing speed, also prevent crash
-os.environ["MXNET_CUDNN_AUTOTUNE_DEFAULT"] = "0"
-
 import cv2
 import gluoncv
 import mxnet as mx
@@ -290,8 +287,7 @@ for i_name in imgFileList:
             
     
         # write percentage
-        jar=np.array2string(j2, separator=',')[1:-1] 
-        jar = jar.replace('\n','') 
+        jar = ",".join(str(rate) for rate in j2.round(4))
         #print(jar)
         g.write(i_name + ',' + jar + '\n')
     
