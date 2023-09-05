@@ -79,8 +79,8 @@ parser.add_argument(
 device_helpstring = """\
 Use CPU or GPU.
 Choice are:
-- literal "auto": program will attempt to utilize GPU. If failed, use CPU. (default)
-- literal "cpu": use CPU.
+- literal "auto": program will attempt to utilize GPU. If failed, use CPUs. (default)
+- literal "cpu": use CPUs.
 - literal "gpu": use the first GPU device.
 - a digit like 0, 1, or 2: Use the GPU device specified by the index.
 """
