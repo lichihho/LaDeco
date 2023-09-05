@@ -14,8 +14,8 @@ $ conda env create
 #### RTX 30 series and newer
 
 Latest version of MXNet are not currently support Windows platform well.  
-It is recommanded to install `ladeco` in [WSL2][] via `Conda` package manager:
-```bash
+It is recommanded to install LaDeco in [WSL2][] via `Conda` package manager:
+```console
 >conda env create
 ```
 
