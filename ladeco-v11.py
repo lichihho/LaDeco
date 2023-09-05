@@ -3,13 +3,12 @@
 import argparse
 import os
 import sys
+import time
 from os import walk
-from os.path import join
+from os.path import join as joinpath
 
 # following statement is to fasten processing speed, also prevent crash
 os.environ["MXNET_CUDNN_AUTOTUNE_DEFAULT"] = "0"
-
-import time
 
 import cv2
 import gluoncv
@@ -99,7 +98,7 @@ if not os.path.isdir(img_path):
     print(f"{sys.argv[0]}:FATAL:{img_path} is not a folder.", sys.stderr)
     sys.exit(1)
 
-model_name = "deeplab_resnest269_ade"  # pre-trainded model
+model_name = args.model  # pre-trainded model
 threshold = args.threshold
 
 # ctx: mxnet context (use CPUs or which GPU)
@@ -120,13 +119,13 @@ del model_helpstring, device_helpstring, args
 
 
 # ------------------------------------------------------------------------
-#
+# Prepare I/O targets
 # ------------------------------------------------------------------------
 # following code read files in subdir
 fileList = []
 for root, dirs, files in walk(img_path):
     for f in files:
-        fullpath = join(root, f)
+        fullpath = joinpath(root, f)
         fileList.append(fullpath)
         # print(fullpath)
 
@@ -135,17 +134,26 @@ imgFileList = [name for name in fileList if name.lower().endswith((".jpg", ".png
 all_file_list_len = len(imgFileList)
 # imgFileList = sorted(glob.glob(img_path + '*.[Jj][Pp][Gg]') + glob.glob(img_path + '*.[Pp][Nn][Gg]'))
 
+if all_file_list_len == 0:
+    print(
+        f"{sys.argv[0]}:WARNING:No image file with extension "
+        f"'.jpg' or '.png' found in {img_path}, abort.",
+        sys.stderr,
+    )
+    sys.exit(1)
 
 csv_name = model_name + "_sceneElements.csv"
 count_start = time.time()
 
-camFolderName = time.strftime("%Y_%m%d_%H%M%S_LADECO", time.localtime())
-# imgfoldername = os.getcwd() +'\\' + camFolderName + '\\'+ camFolderName +'_img' #segmentaion image folder
+out_folder = time.strftime("%Y_%m%d_%H%M%S_LADECO", time.localtime())
+# imgfoldername = os.getcwd() +'\\' + out_folder + '\\'+ out_folder +'_img' #segmentaion image folder
 
-if not os.path.isdir(camFolderName):
-    os.mkdir(camFolderName)
+if not os.path.isdir(out_folder):
+    os.mkdir(out_folder)
     # os.mkdir(imgfoldername)
-file_name_attribute = "ladeco_v11.txt"  # label file
+file_name_attribute = joinpath(
+    os.path.dirname(__file__), "ladeco_v11.txt"
+)  # label file
 
 # generate csv head
 with open(file_name_attribute, encoding="utf-8") as h:
@@ -153,17 +161,16 @@ with open(file_name_attribute, encoding="utf-8") as h:
     labels_attributetitle = ",".join([item.rstrip() for item in lines])
 
 
-g = open(camFolderName + "\\" + camFolderName + ".csv", "a+")
+g = open(joinpath(out_folder, out_folder + ".csv"), "a+")
 g.write("fid," + labels_attributetitle + "\n")
 
-model = gluoncv.model_zoo.get_model(
-    model_name, pretrained=True, ctx=mx.gpu(0)
-)  # get model
+model = gluoncv.model_zoo.get_model(model_name, pretrained=True, ctx=ctx)  # get model
 
-error_txt_path = os.getcwd() + "\\" + camFolderName + "\\error.txt"  # save error txt
+error_txt_path = joinpath(out_folder, "error.txt")  # save error txt
+
 
 # ------------------------------------------------------------------------
-#
+# Calculating
 # ------------------------------------------------------------------------
 # fmt: off
 count = 0
