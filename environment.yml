@@ -1,0 +1,17 @@
+name: ladeco
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.8
+  - cudatoolkit=11.2
+  - cudnn=8.1
+  - nccl
+  - pip
+  - pip:
+    - numpy==1.23.5
+    - mxnet-cu112
+    - gluoncv
+variables:
+  MXNET_CUDNN_AUTOTUNE_DEFAULT: 0
+  MXNET_CUDNN_LIB_CHECKING: 0
