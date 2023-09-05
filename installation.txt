@@ -1,0 +1,12 @@
+installation
+
+Using Anaconda environment in windows10
+
+1. conda create -n mxnet python==3.8
+2. conda activate mxnet
+3. conda install cudatoolkit=10.2
+4. pip install mxnet-cu102 -f https://dist.mxnet.io/python
+5. Pip install gluoncv
+
+ps. 
+1. MXnet supports cuda 10.2 and below in windows plateform.
