@@ -1,5 +1,5 @@
 # LaDeco: A Tool to Analyze Visual Landscape Elements
-Citation: Li-Chih Ho (2024). LaDeco: Atool to Analyze Visual Landscape Elemnts. Ecological Informatics.
+Citation: Li-Chih Ho (2024). LaDeco: Atool to Analyze Visual Landscape Elemnts. Ecological Informatics,78,102289.
 
 ## Abstract
   The assessment of visual landscape elements plays a crucial role in landscape change studies, aesthetic evaluation, and visual impact assessment. The proportions and statistical distributions of these elements are key factors that significantly influence these domains. Historically, the analysis has been performed manually, a process that is both labor intensive and time consuming, particularly when dealing with large assessment regions. To address this limitation, this study employs cutting-edge artificial intelligence technology to introduce an automated tool called LaDeco (Landscape Decoder). This tool enables researchers, planners, and evaluators to rapidly and objectively calculate the proportions of visual elements in images, thereby streamlining the assessment process.
