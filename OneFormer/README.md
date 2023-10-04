@@ -8,6 +8,11 @@ Since MXNet is not user friendly enough at installation for Microsoft Windows© 
 conda env create
 ```
 
+For CPU only inference, use `environ_cpu.yml` to install
+```console
+conda env create --file environ_cpu.yml
+```
+
 # Usage
 
 Please refer to [upper README.md](../README.md#Usage)
