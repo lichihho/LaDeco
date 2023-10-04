@@ -1,0 +1,14 @@
+name: ladeco
+channels:
+  - pytorch
+dependencies:
+  - python=3.9
+  - pytorch
+  - torchvision
+  - cpuonly
+  - HuggingFace::transformers>=4.33.1
+  - pip
+  - pip:
+    - scipy
+    - opencv-python
+    - numpy
