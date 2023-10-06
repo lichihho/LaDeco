@@ -20,7 +20,7 @@ conda env create --file environ_cpu.yml
 ## MacOS
 
 ```bash
-ocnda env create --file environ_MacOS.yml
+conda env create --file environ_MacOS.yml
 ```
 
 Note, MPS acceleration is available on MacOS 12.3+.
