@@ -10,8 +10,8 @@ link: https://doi.org/10.1016/j.ecoinf.2023.102289
 
 ![LaDeco-v11](https://github.com/lichihho/LaDeco/assets/35607785/4d846545-25dc-488c-a900-fe29e7ecf8d4)
 
-
-  
+### New!!We offer a new version of LaDeco using the state-of-the-art Oneformer engine. Easier to install and more accurate.[Link]:[
+](https://github.com/lichihho/LaDeco/tree/main/OneFormer)
 
 ## Installation
 
