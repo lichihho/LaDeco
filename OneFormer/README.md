@@ -4,6 +4,10 @@ Since MXNet is not user friendly enough at installation for Microsoft Windows© 
 
 # Installation
 
+It is the most convient to install using [Anaconda][] or [Miniconda][].
+
+## Windows & Linux
+
 ```console
 conda env create
 ```
@@ -12,6 +16,18 @@ For CPU only inference, use `environ_cpu.yml` to install
 ```console
 conda env create --file environ_cpu.yml
 ```
+
+## MacOS
+
+```bash
+ocnda env create --file environ_MacOS.yml
+```
+
+Note, MPS acceleration is available on MacOS 12.3+.
+
+
+[Anaconda]: https://www.anaconda.com/download
+[Miniconda]: https://docs.conda.io/projects/miniconda/en/latest/
 
 # Usage
 
