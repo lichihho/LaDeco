@@ -3,7 +3,7 @@ Citation: Li-Chih Ho (2023). LaDeco: Atool to Analyze Visual Landscape Elemnts. 
 
 link: https://doi.org/10.1016/j.ecoinf.2023.102289
 
-#### New!! We offer a new version of LaDeco using the state-of-the-art OneＦormer engine. Easier to install and more accurate.
+#### New!!2023/10/6 We offer a new version of LaDeco using the state-of-the-art OneＦormer engine. Easier to install and more accurate.
 Link: https://github.com/lichihho/LaDeco/tree/main/OneFormer
 
 ## Abstract
