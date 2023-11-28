@@ -1,5 +1,5 @@
 # LaDeco: A Tool to Analyze Visual Landscape Elements
-Citation: Li-Chih Ho (2023). LaDeco: Atool to Analyze Visual Landscape Elemnts. Ecological Informatics,78,102289.
+Citation: Li-Chih Ho (2023). LaDeco: A Tool to Analyze Visual Landscape Elements. Ecological Informatics,78,102289.
 
 link: https://doi.org/10.1016/j.ecoinf.2023.102289
 
