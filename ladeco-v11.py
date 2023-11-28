@@ -153,12 +153,12 @@ file_name_attribute = joinpath(
 )  # label file
 
 # generate csv head
-with open(file_name_attribute, encoding="utf-8") as h:
+with open(file_name_attribute, encoding="utf-8-sig") as h:
     lines = h.readlines()
     labels_attributetitle = ",".join([item.rstrip() for item in lines])
 
 
-g = open(joinpath(out_folder, out_folder + ".csv"), "a+")
+g = open(joinpath(out_folder, out_folder + ".csv"), "a+", encoding="utf-8-sig")
 g.write("fid," + labels_attributetitle + "\n")
 
 model = gluoncv.model_zoo.get_model(model_name, pretrained=True, ctx=ctx)  # get model
@@ -294,7 +294,7 @@ for i_name in imgFileList:
     
 
     except:
-        with open(error_txt_path, 'a+') as txt:
+        with open(error_txt_path, 'a+', encoding="utf-8-sig") as txt:
             txt.writelines(f'{i_name}' + '\n')
         print('Something Error!')
 g.close()
