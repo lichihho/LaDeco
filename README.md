@@ -15,6 +15,8 @@ Link: https://github.com/lichihho/LaDeco/tree/main/OneFormer
 
 
 ## Installation
+1. Before executing the following commands, please first clone the LaDeco folder to your local machine.
+2. Please execute all commands within the folder.
 
 ### Linux or MaxOS
 
