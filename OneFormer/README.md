@@ -6,6 +6,9 @@ Since MXNet is not user friendly enough at installation for Microsoft Windows© 
 
 It is the most convient to install using [Anaconda][] or [Miniconda][].
 
+1. Before executing the following commands, please first clone the LaDeco folder to your local machine.
+2. Please execute all commands within the folder.
+
 ## Windows & Linux
 
 ```console
