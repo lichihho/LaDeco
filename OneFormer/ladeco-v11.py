@@ -1,5 +1,38 @@
 # v1.1 2021/03/10 change l-3 level to woody and herb
-from __future__ import annotations  # for explicit type annotation in py3.8
+import warnings
+
+
+# those warning is propogeted from implementation of oneformer, we don't take care of them here.
+warnings.filterwarnings(
+    "ignore", category=FutureWarning, module="transformers.models.oneformer.image_processing_oneformer"
+)
+# original warning message:
+# .../transformers/models/oneformer/image_processing_oneformer.py:427:
+# futurewarning: the `reduce_labels` argument is deprecated and will be removed in v4.27. please use `do_reduce_labels` instead.
+
+warnings.filterwarnings("ignore", category=UserWarning, module="torch.functional")
+# original warning message:
+# .../torch/functional.py:504:
+# userwarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument.
+# (triggered internally at /opt/conda/conda-bld/pytorch_1682343995026/work/aten/src/aten/native/tensorshape.cpp:3483.)
+# return _vf.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
+
+warnings.filterwarnings("ignore", category=FutureWarning, module="transformers.utils.generic")
+# original warning message:
+# .../transformers/utils/generic.py:311: FutureWarning: `torch.utils._pytree._register_pytree_node` is deprecated. Please use `torch.utils._pytree.register_pytree_node` instead.
+
+warnings.filterwarnings("ignore", category=FutureWarning, module="huggingface_hub.file_download")
+# original message:
+# .../huggingface_hub/file_download.py:1132: FutureWarning: `resume_download` is deprecated and will be removed in version 1.0.0. Downloads always resume when possible. If you want to force a new download, use `force_download=True`.
+
+warnings.filterwarnings("ignore", category=FutureWarning, module="transformers.modeling_utils")
+# Loading the model will automatically execute arbitrary code the OneFormer team writtten,
+# please check OneFormer's repository if you have any question:
+# https://huggingface.co/spaces/shi-labs/OneFormer/tree/main/oneformer
+#
+# original message:
+# .../transformers/modeling_utils.py:488: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+
 
 from functools import partial
 from os import walk
@@ -13,24 +46,6 @@ import os
 import sys
 import time
 import torch
-import warnings
-
-
-warnings.filterwarnings(
-    "ignore", category=FutureWarning, module=".*processing_oneformer.*"
-)
-# this warning is propogeting from transfomer's implementation of oneformer, we don't take care of it here.
-# original warning message:
-# ...python3.10/site-packages/transformers/models/oneformer/image_processing_oneformer.py:427:
-# futurewarning: the `reduce_labels` argument is deprecated and will be removed in v4.27. please use `do_reduce_labels` instead.
-
-warnings.filterwarnings("ignore", category=UserWarning, module=".*functional.*")
-# this warning is the same as above one.
-# original warning message:
-# ...python3.10/site-packages/torch/functional.py:504:
-# userwarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument.
-# (triggered internally at /opt/conda/conda-bld/pytorch_1682343995026/work/aten/src/aten/native/tensorshape.cpp:3483.)
-# return _vf.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
 
 
 def read_image(image):
