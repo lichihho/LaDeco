@@ -2,9 +2,11 @@
 import warnings
 
 
-# those warning is propogeted from implementation of oneformer, we don't take care of them here.
+# those warnings are propogeted from implementation of oneformer, we don't take care of them here.
 warnings.filterwarnings(
-    "ignore", category=FutureWarning, module="transformers.models.oneformer.image_processing_oneformer"
+    "ignore",
+    category=FutureWarning,
+    module="transformers.models.oneformer.image_processing_oneformer",
 )
 # original warning message:
 # .../transformers/models/oneformer/image_processing_oneformer.py:427:
@@ -17,15 +19,21 @@ warnings.filterwarnings("ignore", category=UserWarning, module="torch.functional
 # (triggered internally at /opt/conda/conda-bld/pytorch_1682343995026/work/aten/src/aten/native/tensorshape.cpp:3483.)
 # return _vf.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
 
-warnings.filterwarnings("ignore", category=FutureWarning, module="transformers.utils.generic")
+warnings.filterwarnings(
+    "ignore", category=FutureWarning, module="transformers.utils.generic"
+)
 # original warning message:
 # .../transformers/utils/generic.py:311: FutureWarning: `torch.utils._pytree._register_pytree_node` is deprecated. Please use `torch.utils._pytree.register_pytree_node` instead.
 
-warnings.filterwarnings("ignore", category=FutureWarning, module="huggingface_hub.file_download")
+warnings.filterwarnings(
+    "ignore", category=FutureWarning, module="huggingface_hub.file_download"
+)
 # original message:
 # .../huggingface_hub/file_download.py:1132: FutureWarning: `resume_download` is deprecated and will be removed in version 1.0.0. Downloads always resume when possible. If you want to force a new download, use `force_download=True`.
 
-warnings.filterwarnings("ignore", category=FutureWarning, module="transformers.modeling_utils")
+warnings.filterwarnings(
+    "ignore", category=FutureWarning, module="transformers.modeling_utils"
+)
 # Loading the model will automatically execute arbitrary code the OneFormer team writtten,
 # please check OneFormer's repository if you have any question:
 # https://huggingface.co/spaces/shi-labs/OneFormer/tree/main/oneformer
@@ -40,18 +48,13 @@ from os.path import join as joinpath
 from transformers import OneFormerForUniversalSegmentation, OneFormerProcessor
 
 import argparse
+import atexit
 import cv2
 import numpy as np
 import os
 import sys
 import time
 import torch
-
-
-def read_image(image):
-    raw_data = np.fromfile(image, dtype=np.uint8)
-    img = cv2.imdecode(raw_data, 1)
-    return img
 
 
 # ------------------------------------------------------------------------
@@ -141,12 +144,10 @@ for root, dirs, files in walk(img_path):
     for f in files:
         fullpath = joinpath(root, f)
         fileList.append(fullpath)
-        # print(fullpath)
 
 # select only jpg and png files in fileList
 imgFileList = [name for name in fileList if name.lower().endswith((".jpg", ".png"))]
 all_file_list_len = len(imgFileList)
-# imgFileList = sorted(glob.glob(img_path + '*.[Jj][Pp][Gg]') + glob.glob(img_path + '*.[Pp][Nn][Gg]'))
 
 if all_file_list_len == 0:
     print(
@@ -156,15 +157,12 @@ if all_file_list_len == 0:
     )
     sys.exit(1)
 
-csv_name = model_name + "_sceneElements.csv"
 count_start = time.time()
 
 out_folder = time.strftime("%Y_%m%d_%H%M%S_LADECO", time.localtime())
-# imgfoldername = os.getcwd() +'\\' + out_folder + '\\'+ out_folder +'_img' #segmentaion image folder
 
 if not os.path.isdir(out_folder):
     os.mkdir(out_folder)
-    # os.mkdir(imgfoldername)
 file_name_attribute = joinpath(
     os.path.dirname(__file__), "ladeco_v11.txt"
 )  # label file
@@ -174,11 +172,14 @@ with open(file_name_attribute, encoding="utf-8-sig") as h:
     lines = h.readlines()
     labels_attributetitle = ",".join([item.rstrip() for item in lines])
 
+outpath = joinpath(out_folder, out_folder + ".csv")
+outfile = open(outpath, "w", encoding="utf-8-sig")
+atexit.register(outfile.close)
 
-g = open(joinpath(out_folder, out_folder + ".csv"), "a+", encoding="utf-8-sig")
-g.write("fid," + labels_attributetitle + "\n")
+header = "fid" + "," + labels_attributetitle
+outfile.write(header + "\n")
 
-error_txt_path = joinpath(out_folder, "error.txt")  # save error txt
+error_path = joinpath(out_folder, "error.txt")
 
 
 # ------------------------------------------------------------------------
@@ -193,6 +194,8 @@ def transformer_inference(
 ) -> torch.Tensor:
     """A function wraps inference procedual of HuggingFace transformers OneFormer's
     semantic segmantation.
+
+    returns HxW torch.Tensor where H is height of input image array, W is the width
     """
     sample = processor(
         images=image, task_inputs=task_inputs, return_tensors=return_tensors
@@ -222,45 +225,32 @@ segment = partial(
 # Calculating and Saving Results
 # ------------------------------------------------------------------------
 # fmt: off
-count = 0
-for i_name in imgFileList:
+for idx, i_name in enumerate(imgFileList):
+    print(f'{idx + 1}/{all_file_list_len}')
+
     try:
-        count += 1
-        print(f'{count}/{all_file_list_len}')
-        #now_file_name = i_name.replace(img_path,'')[0:22]
-        #now_file_name = i_name.replace(img_path,'')
-        #index_num = imgFileList.index(i_name)
+        raw_data = np.fromfile(i_name, dtype=np.uint8)
+        img = cv2.imdecode(raw_data, 1)
 
-        #img = image.imread(i_name)
-        # read chinese path
-        img = read_image(i_name)
-
-        #segmentation
         mask = segment(img).cpu().numpy()
 
+        print('height =', mask.shape[0])
+        print('width =', mask.shape[1])
+        print('total pixels =', mask.size)
 
-        print('height = ',len(mask))
-        print('width = ',len(list(mask[0])))
-
-
-        #compute all pixels
-        a=mask.shape
-        allpix=a[0]*a[1]
-        jarray=np.zeros([150])
-        #j2 = np.zeros([74])
-        print(allpix)
-
-        for j in range(150):
-            o=round( (np.count_nonzero(mask == j))/allpix, 3)
-            jarray[j]=o
+        # jarray: container of area ratios for ADE20k - SceneParsing150 categories
+        # its elements are area ratio of certain scene element to whole picture
+        jarray = np.zeros(150)
+        for j in range(jarray.size):
+            n_pixels = np.count_nonzero(mask == j)
+            jarray[j] = round(n_pixels / mask.size, 3)
 
         # clean value that smaller than threshold eg. < 0.01
-        jarray=np.where(jarray < threshold, 0, jarray);
+        la = np.where(jarray < threshold, 0, jarray)
 
-
-        # compute various Levels of landscape elements
-        la = jarray
-
+        ################################################
+        # compute various Levels of landscape elements #
+        ################################################
         # Merge L-4 element
         L4_ground = la[13] + la[94] # Earth/Ground + Ground/Land
         L4_Building = la[1] + la[25] # Building + House
@@ -293,8 +283,10 @@ for i_name in imgFileList:
 
         #Street
         L3_roadway = la[6] + la[11] + la[52] + la[59]
-        L3_furniture = la[15] + la[19] + la[32] + la[69] + la[87] + la[88] +la[125] +\
-            la[138] + la[149] + la[132]
+        L3_furniture = (
+            la[15] + la[19] + la[32] + la[69] + la[87] + la[88] + la[125]
+            + la[138] + la[149] + la[132]
+        )
         L3_vehicle = la[20] + la[80] + la[83] + la[102] + la[116] + la[127]
         L3_sign = la[43] + la[100] + la[136]
 
@@ -314,40 +306,49 @@ for i_name in imgFileList:
         # others
         others = 1 - L1_nature - L1_man_made
 
-
         # Landscape Character
-        NFI = (L1_nature) / (L1_nature + L1_man_made)
-                    # correlation with 480img was 0.896
+        NFI = L1_nature / (L1_nature + L1_man_made)
 
         # prepare CSV table
-        j2 = np.array([L1_nature, L1_man_made, L2_landform, L2_vegetation, L2_water, L2_bio, L2_sky, L2_archi, L2_street,\
-                L3_hori_land, L3_vert_land, L3_woody_plant, L3_herb_plant, L3_flower, L3_hori_water, L3_vert_water, L3_human, L3_animal, L3_sky,\
-                L3_architecture, L3_archi_parts, L3_roadway, L3_furniture, L3_vehicle, L3_sign,\
-                L4_ground, la[29], la[46], la[91], la[52], la[16], la[68], la[34],\
-                la[4], la[72], la[17], la[9], la[66],\
-                la[21], la[26], la[60], la[109], la[128], la[104], la[113],\
-                la[12], la[126], la[2],\
-                L4_Building, la[79], la[84], la[48], la[0], la[8], la[14], la[78], L4_Canopy, la[121],\
-                la[6], la[11], la[59],\
-                la[15], la[19], la[32], la[69],la[87], la[88], la[125], la[138], la[149], la[132],\
-                la[20], la[80], la[83], la[102], la[116], la[127],\
-                la[43], la[100], la[136],\
-                others,\
-                NFI])
-
+        j2 = np.array(
+            [
+                L1_nature, L1_man_made, L2_landform, L2_vegetation, L2_water, L2_bio, L2_sky, L2_archi, L2_street,
+                L3_hori_land, L3_vert_land, L3_woody_plant, L3_herb_plant, L3_flower, L3_hori_water, L3_vert_water, L3_human, L3_animal, L3_sky,
+                L3_architecture, L3_archi_parts, L3_roadway, L3_furniture, L3_vehicle, L3_sign,
+                L4_ground, la[29], la[46], la[91], la[52], la[16], la[68], la[34],
+                la[4], la[72], la[17], la[9], la[66],
+                la[21], la[26], la[60], la[109], la[128], la[104], la[113],
+                la[12], la[126], la[2],
+                L4_Building, la[79], la[84], la[48], la[0], la[8], la[14], la[78], L4_Canopy, la[121],
+                la[6], la[11], la[59],
+                la[15], la[19], la[32], la[69],la[87], la[88], la[125], la[138], la[149], la[132],
+                la[20], la[80], la[83], la[102], la[116], la[127],
+                la[43], la[100], la[136],
+                others,
+                NFI
+            ]
+        )
 
         # write percentage
-        jar = ",".join(str(rate) for rate in j2.round(4))
-        #print(jar)
-        g.write(i_name + ',' + jar + '\n')
+        jar = ','.join(str(rate) for rate in j2.round(4))
+        if ' ' in i_name:
+            filename = '"' + i_name + '"'
+        else:
+            filename = i_name
+        outfile.write(filename + ',' + jar + '\n')
+    except KeyboardInterrupt:
+        print('\nInterrupted by user.')
+        print('bye~')
+        exit()
+    except Exception as exc:
+        exc_name = exc.__class__.__name__
+        exc_msg = exc.__str__()
 
+        with open(error_path, 'a+', encoding="utf-8-sig") as errfile:
+            errfile.write(i_name + ' | ' + exc_name + ':' + exc_msg + '\n')
 
+        print('Error! ' + exc_name + ':' + exc_msg, file=sys.stderr)
+        print('On image: ' + i_name, file=sys.stderr)
 
-    except:
-        with open(error_txt_path, 'a+', encoding="utf-8-sig") as txt:
-            txt.writelines(f'{i_name}' + '\n')
-        print('Something Error!')
-g.close()
-
-count_end = time.time()
-print('excecute time = ',count_end - count_start,'s')
+elapsed_time = time.time() - count_start
+print('excecute time =', elapsed_time, 's')
