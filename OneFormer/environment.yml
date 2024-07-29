@@ -7,9 +7,7 @@ dependencies:
   - pytorch=2.1.0
   - torchvision
   - pytorch-cuda=11.8
-  - HuggingFace::transformers>=4.33.1
-  - pip
-  - pip:
-    - scipy
-    - opencv-python
-    - numpy
+  - numpy
+  - HuggingFace::transformers=4.33
+  - conda-forge::opencv
+  - conda-forge::scipy
