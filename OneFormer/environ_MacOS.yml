@@ -5,9 +5,7 @@ dependencies:
   - python=3.9
   - pytorch
   - torchvision
-  - HuggingFace::transformers>=4.33.1
-  - pip
-  - pip:
-    - scipy
-    - opencv-python
-    - numpy
+  - numpy
+  - HuggingFace::transformers=4.33.1
+  - conda-forge::scipy
+  - conda-forge::opencv
