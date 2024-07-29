@@ -4,10 +4,10 @@ channels:
   - nvidia
 dependencies:
   - python=3.9
-  - pytorch=2.1.0
-  - torchvision
+  - pytorch=2.1
+  - torchvision=0.16
   - pytorch-cuda=11.8
-  - numpy
+  - numpy=1.26
   - HuggingFace::transformers=4.33
-  - conda-forge::opencv
-  - conda-forge::scipy
+  - conda-forge::opencv=4.10
+  - conda-forge::scipy=1.13
