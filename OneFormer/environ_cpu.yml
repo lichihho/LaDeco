@@ -3,10 +3,10 @@ channels:
   - pytorch
 dependencies:
   - python=3.9
-  - pytorch
-  - torchvision
+  - pytorch=2.1
+  - torchvision=0.16
   - cpuonly
-  - numpy
+  - numpy=1.26
   - HuggingFace::transformers=4.33
-  - conda-forge::scipy
-  - conda-forge::opencv
+  - conda-forge::scipy=1.13
+  - conda-forge::opencv=4.10
