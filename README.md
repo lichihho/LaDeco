@@ -3,8 +3,9 @@ Citation: Li-Chih Ho (2023). LaDeco: A Tool to Analyze Visual Landscape Elements
 
 link: https://doi.org/10.1016/j.ecoinf.2023.102289
 
-#### New!!2023/10/6 We offer a new version of LaDeco using the state-of-the-art OneＦormer engine. Easier to install and more accurate.
-Link: https://github.com/lichihho/LaDeco/tree/main/OneFormer
+## CHANGELOG
+- 2025/6/3 The GloneCV Deeplab v3 + RestNext backbone, which functioned as LaDeco’s ADE20K semantic segmentation engine, has been removed due to its deprecated status.
+- 2023/10/6 We offer a new version of LaDeco using the state-of-the-art OneFormer engine. Easier to install and more accurate.
 
 ## Abstract
   The assessment of visual landscape elements plays a crucial role in landscape change studies, aesthetic evaluation, and visual impact assessment. The proportions and statistical distributions of these elements are key factors that significantly influence these domains. Historically, the analysis has been performed manually, a process that is both labor intensive and time consuming, particularly when dealing with large assessment regions. To address this limitation, this study employs cutting-edge artificial intelligence technology to introduce an automated tool called LaDeco (Landscape Decoder). This tool enables researchers, planners, and evaluators to rapidly and objectively calculate the proportions of visual elements in images, thereby streamlining the assessment process.
@@ -15,50 +16,39 @@ Link: https://github.com/lichihho/LaDeco/tree/main/OneFormer
 
 
 ## Installation
-1. Before executing the following commands, please first clone the LaDeco folder to your local machine.
-2. Please execute all commands within the folder.
 
-### Linux or MaxOS
+Installing via [Anaconda][] or [Miniconda][] is the most convenient method.
 
-The easiest way to install LaDeco's dependencies is installing via `Conda` package manager:
+### Common
+
+Run those commands before heading into OS-specific guide:
+```console
+git clone https://github.com/lichihho/LaDeco.git
+cd LaDeco
+```
+
+### Windows & Linux
+
+```console
+conda env create
+```
+
+For CPU only inference, use `environ_cpu.yml` to install
+```console
+conda env create --file environ_cpu.yml
+```
+
+### MacOS
+
 ```bash
-$ conda env create
+conda env create --file environ_MacOS.yml
 ```
 
-### Windows
-
-#### RTX 30 series and newer
-
-Latest version of MXNet are not currently support Windows platform well.  
-It is recommanded to install LaDeco in [WSL2][] via `Conda` package manager:
-```console
->conda env create
-```
-
-#### RTX 20 series and older
-
-If your VGA card are RTX 20 series or older ones, it is possible to install the dependencies
-directly on your Windows machine by following commands.
-
-```console
->conda create -n ladeco python==3.8
->conda activate ladeco
->conda install cudatoolkit=10.2
->pip install mxnet-cu102==1.7.0
->pip install gluoncv
-```
-
-Optionally, you may want to set environment variable `MXNET_CUDNN_AUTOTUNE_DEFAULT` to `0`.
+* *MPS acceleration is available on MacOS 12.3+.
 
 
-```console
->conda env config vars set MXNET_CUDNN_AUTOTUNE_DEFAULT=0
-```
-
-Sometimes, the auto-tune process will cause a problem and leads to a much slower initialization.
-
-
-[WSL2]: https://learn.microsoft.com/en-us/windows/wsl/install
+[Anaconda]: https://www.anaconda.com/download
+[Miniconda]: https://docs.conda.io/projects/miniconda/en/latest/
 
 ## Usage
 
@@ -136,4 +126,18 @@ optional arguments:
                         - literal "cpu": use CPUs.
                         - literal "gpu": use the first GPU device.
                         - a digit like 0, 1, or 2: Use the GPU device specified by the index.
+```
+
+# Acknowledgment  
+
+Our implementation relies on [OneFormer](https://arxiv.org/abs/2211.06220), whose foundational research was conducted by its original developers; we express our deep appreciation for their efforts.
+```
+@misc{jain2022oneformer,
+      title={OneFormer: One Transformer to Rule Universal Image Segmentation}, 
+      author={Jitesh Jain and Jiachen Li and MangTik Chiu and Ali Hassani and Nikita Orlov and Humphrey Shi},
+      year={2022},
+      eprint={2211.06220},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
 ```

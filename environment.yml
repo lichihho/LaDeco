@@ -1,20 +1,13 @@
 name: ladeco
 channels:
-  - conda-forge
-  - defaults
+  - pytorch
+  - nvidia
 dependencies:
-  - python=3.8
-  - cudatoolkit=11.2
-  - cudnn=8.1
-  - nccl
-  - pip
-  - pip:
-    - numpy==1.23.5
-    - mxnet-cu112
-    - gluoncv
-variables:
-  # Sometimes cudnn autotune will cause problem and lead to a much slower initialization.
-  MXNET_CUDNN_AUTOTUNE_DEFAULT: 0
-  # cudnn=8.1 in conda-forge is 8100, but cudatoolkit=11.8 is compiled toward 8101.
-  # It's ok to use 8100, set MXNET_CUDNN_LIB_CHECKING to 0 to mute the wraning.
-  MXNET_CUDNN_LIB_CHECKING: 0
+  - python=3.9
+  - pytorch=2.1
+  - torchvision=0.16
+  - pytorch-cuda=11.8
+  - numpy=1.26
+  - HuggingFace::transformers=4.33
+  - conda-forge::opencv=4.10
+  - conda-forge::scipy=1.13
