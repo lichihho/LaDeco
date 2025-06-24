@@ -6,6 +6,6 @@ dependencies:
   - pytorch=2.1
   - torchvision=0.16
   - numpy=1.26
-  - HuggingFace::transformers=4.33.1
-  - conda-forge::scip=1.13
+  - HuggingFace::transformers>=4.33.1
+  - conda-forge::scipy=1.13
   - conda-forge::opencv=4.10
