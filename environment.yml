@@ -8,6 +8,6 @@ dependencies:
   - torchvision=0.16
   - pytorch-cuda=11.8
   - numpy=1.26
-  - HuggingFace::transformers=4.33
+  - HuggingFace::transformers>=4.33
   - conda-forge::opencv=4.10
   - conda-forge::scipy=1.13
