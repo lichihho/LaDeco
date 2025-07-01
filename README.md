@@ -107,16 +107,9 @@ optional arguments:
   -m MODEL, --model MODEL
                         The semantic segmantation model.
                         Choose one from below:
-                        fcn_resnet50_ade
-                        fcn_resnet101_ade
-                        psp_resnet50_ade
-                        psp_resnet101_ade
-                        deeplab_resnet50_ade
-                        deeplab_resnet101_ade
-                        deeplab_resnest50_ade
-                        deeplab_resnest101_ade
-                        deeplab_resnest200_ade
-                        deeplab_resnest269_ade (default)
+                        shi-labs/oneformer_ade20k_swin_tiny
+                        shi-labs/oneformer_ade20k_swin_large (default)
+                        shi-labs/oneformer_ade20k_dinat_large
   -t THRESHOLD, --threshold THRESHOLD
                         The thresold to round an element to zero. (default 0.01)
   -d DEVICE, --device DEVICE
